@@ -8,12 +8,20 @@ class InterfaceTests(unittest.TestCase):
     def test_ProjectDispatchInterface(self):
         def meets_dispatcher(case):
             return issubclass(case, sublp.ProjectDispatchInterface)
-        self.assert_(meets_dispatcher(sublp.OpenFromProjectFilePath))
-        self.assert_(meets_dispatcher(sublp.OpenFromProjectName))
-        self.assert_(meets_dispatcher(sublp.OpenFromDirectory))
 
+        for case in sublp.sublp.cases:
+            self.assert_(meets_dispatcher(case))
+        # self.assert_(meets_dispatcher(sublp.OpenFromProjectFilePath))
+        # self.assert_(meets_dispatcher(sublp.OpenFromProjectName))
+        # self.assert_(meets_dispatcher(sublp.OpenFromDirectory))
+        # self.assert_(meets_dispatcher(sublp.OpenFromFallback))
 
     def test_ExistingDirectory(self):
+
+        import pdb
+        pdb.set_trace()
+        print()
+
         self.assert_(isinstance('test_bypath', sublp.ExistingDirectory))
         self.assert_(not isinstance('_test_bypath', sublp.ExistingDirectory))
 
@@ -31,6 +39,7 @@ class CaseMatchTests(unittest.TestCase):
         self.case1 = sublp.OpenFromProjectFilePath
         self.case2 = sublp.OpenFromProjectName
         self.case3 = sublp.OpenFromDirectory
+        self.case4 = sublp.OpenFromFallback
 
     def matches1(self, name):
         return self.case1.dispatch_check(
@@ -44,25 +53,44 @@ class CaseMatchTests(unittest.TestCase):
         return self.case3.dispatch_check(
             name
         )
-
+    def matches4(self, name):
+        return self.case4.dispatch_check(
+            name
+        )
 
     def test_file_path(self):
         name = os.path.join("test_bypath", "bypath")
         self.assertEquals(self.matches1(name), True)
         self.assertEquals(self.matches2(name), False)
         self.assertEquals(self.matches3(name), False)
+        self.assertEquals(self.matches4(name), False)
+
+        name = os.path.join("test_bypath", "bypath.sublime-project")
+        self.assertEquals(self.matches1(name), True)
+        self.assertEquals(self.matches2(name), False)
+        self.assertEquals(self.matches3(name), False)
+        self.assertEquals(self.matches4(name), True)
 
     def test_in_projects(self):
         name = "byname"
         self.assertEquals(self.matches1(name), False)
         self.assertEquals(self.matches2(name), True)
         self.assertEquals(self.matches3(name), False)
+        self.assertEquals(self.matches4(name), False)
 
     def test_in_directory(self):
         name = "test_project_directory"
         self.assertEquals(self.matches1(name), False)
         self.assertEquals(self.matches2(name), False)
         self.assertEquals(self.matches3(name), True)
+        self.assertEquals(self.matches4(name), True)
+
+    def test_fallback(self):
+        name ="no_project_file"
+        self.assertEquals(self.matches1(name), False)
+        self.assertEquals(self.matches2(name), False)
+        self.assertEquals(self.matches3(name), False)
+        self.assertEquals(self.matches4(name), True)
 
 
 
@@ -138,6 +166,12 @@ class DispatcherTests(unittest.TestCase):
         self.compare_matcher(
             name="test_project_directory",
             case=sublp.OpenFromDirectory
+        )
+
+    def test_fallback(self):
+        self.compare_matcher(
+            name="no_project_file",
+            case=sublp.OpenFromFallback
         )
 
 

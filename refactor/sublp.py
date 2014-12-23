@@ -93,7 +93,7 @@ def is_abstract_method(method):
 #======================================================
 # Class Implementations (~Cases for dispatcher)
 #======================================================
-class OpenFromProjectFilePath(object):
+class OpenFromProjectFilePath(ProjectDispatchInterface):
     """
     Input is path to project file.
     """
@@ -116,7 +116,7 @@ class OpenFromProjectFilePath(object):
         return sublime_project_command(path)
 
 
-class OpenFromProjectName(object):
+class OpenFromProjectName(ProjectDispatchInterface):
     """
     Input is project file, in standard directory for sublime-project files.
     """
@@ -161,7 +161,7 @@ class OpenFromProjectName(object):
         return form_project_path(name, directory)
 
 
-class OpenFromDirectory(object):
+class OpenFromDirectory(ProjectDispatchInterface):
     """
     Open project file contained inside a directory.
     Only works if directory contains only one project file.
@@ -202,6 +202,19 @@ class OpenFromDirectory(object):
         return (len(project_files) == 1)
 
 
+class OpenFromFallback(ProjectDispatchInterface):
+    """Fallback case, if no other cases trigger."""
+    @classmethod
+    def dispatch_check(cls, _string):
+        if isinstance(_string, ExistingPath):
+            return True
+        return False
+
+    @classmethod
+    def form_command(cls, _string):
+        return "sublime "+_string
+
+
 #===================================================
 # Dispatcher
 #===================================================
@@ -213,6 +226,7 @@ class sublp(object):
         OpenFromProjectFilePath,
         OpenFromDirectory,
         OpenFromProjectName,
+        OpenFromFallback
     ]
 
     def __new__(cls, _string):
@@ -316,6 +330,18 @@ class ValueMeta(abc.ABCMeta):
 class ExistingDirectory(str):
     __metaclass__ = ValueMeta
 
+    # def __init__(self, *args, **kwargs):
+    #     cls = type(self)
+    #     super(cls, self).__init__(*args, **kwargs)
+    #     #assert(isinstance(self, cls))
+
+    # @classmethod
+    # def meets(cls, instance):
+    #     if isinstance(instance, basestring):
+    #         if os.path.isdir(instance):
+    #             return True
+    #     return False
+
     @classmethod
     def __instancecheck__(cls, instance):
         if isinstance(instance, basestring):
@@ -323,6 +349,21 @@ class ExistingDirectory(str):
                 return True
         return False
 
+class ExistingFile(str):
+    __metaclass__ = ValueMeta
+
+    @classmethod
+    def __instancecheck__(cls, instance):
+        if isinstance(instance, basestring):
+            if os.path.isfile(instance):
+                return True
+        if isinstance(instance, file):
+            name = getattr(instance, 'name', '')
+            if os.path.isfile(name):
+                return True
+        return False
+
+ExistingPath = (ExistingDirectory, ExistingFile)
 
 #===================================================
 # Support Functions

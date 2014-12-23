@@ -236,7 +236,7 @@ class ValueMeta(abc.ABCMeta):
 
 
 class ExistingDirectory(str):
-    __metaclass__ = ValueABC
+    __metaclass__ = ValueMeta
 
     @classmethod
     def __instancecheck__(cls, instance):
