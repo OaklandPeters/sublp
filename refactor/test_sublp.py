@@ -17,11 +17,6 @@ class InterfaceTests(unittest.TestCase):
         # self.assert_(meets_dispatcher(sublp.OpenFromFallback))
 
     def test_ExistingDirectory(self):
-
-        import pdb
-        pdb.set_trace()
-        print()
-
         self.assert_(isinstance('test_bypath', sublp.ExistingDirectory))
         self.assert_(not isinstance('_test_bypath', sublp.ExistingDirectory))
 

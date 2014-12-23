@@ -328,19 +328,11 @@ class ValueMeta(abc.ABCMeta):
 
 
 class ExistingDirectory(str):
+    """
+    Non-instanced type-checking class (a VOG).
+    Used to confirm that
+    """
     __metaclass__ = ValueMeta
-
-    # def __init__(self, *args, **kwargs):
-    #     cls = type(self)
-    #     super(cls, self).__init__(*args, **kwargs)
-    #     #assert(isinstance(self, cls))
-
-    # @classmethod
-    # def meets(cls, instance):
-    #     if isinstance(instance, basestring):
-    #         if os.path.isdir(instance):
-    #             return True
-    #     return False
 
     @classmethod
     def __instancecheck__(cls, instance):
@@ -350,16 +342,15 @@ class ExistingDirectory(str):
         return False
 
 class ExistingFile(str):
+    """
+    Non-instanced type-checking class (a VOG).
+    """
     __metaclass__ = ValueMeta
 
     @classmethod
     def __instancecheck__(cls, instance):
         if isinstance(instance, basestring):
             if os.path.isfile(instance):
-                return True
-        if isinstance(instance, file):
-            name = getattr(instance, 'name', '')
-            if os.path.isfile(name):
                 return True
         return False
 
