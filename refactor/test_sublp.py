@@ -140,15 +140,6 @@ class FormCommandTests(unittest.TestCase):
 class DispatcherTests(unittest.TestCase):
 
     def compare_matcher(self, name, case):
-
-
-        print()
-        print(case)
-        print()
-        import pdb
-        pdb.set_trace()
-        print()
-
         result = sublp.Sublp.match(name)
         self.assertEqual(result, case)
 

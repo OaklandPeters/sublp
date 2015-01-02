@@ -20,74 +20,13 @@ Refactorings to do in Eclipse:
 """
 
 import os
-import abc
 import subprocess
+import sys
 
-
-class OpenProjectCaseInterface(object):
-    """
-    Interface for dispatching on the input cases.
-    """
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractmethod
-    def matches(cls, _string, *args, **kwargs):  # pylint: disable=no-self-argument
-        """
-        @type: _string: str
-        @returns: bool
-        """
-        return NotImplemented
-
-    @abc.abstractmethod
-    def command(cls, _string, *args, **kwargs):  # pylint: disable=no-self-argument
-        """
-        @type: _string: str
-        @returns: str
-        """
-        return NotImplemented
-
-    @classmethod
-    def __subclasshook__(cls, subclass):
-        if cls is OpenProjectCaseInterface:
-            if meets(subclass, cls):
-                return True
-        return NotImplemented
-
-
-def meets(obj, interface):
-    """
-    @type: obj: object
-    @type: interface: abc.ABCMeta
-    @rtype: bool
-    """
-    return bool(list(missing_abstracts(obj, interface)))
-
-
-def missing_abstracts(obj, interface):
-    """
-    @type: obj: object
-    @type: interface: abc.ABCMeta
-    @rtype: str
-    """
-    for name in interface.__abstractmethods__:
-        if not has_concrete_method(obj, name):
-            yield name
-
-
-def has_concrete_method(obj, name):
-    """
-    @type: obj: object
-    @type: name: str
-    @returns: bool
-    """
-    if hasattr(obj, name):
-        return is_abstract_method(getattr(obj, name))
-    else:
-        return False
-
-
-def is_abstract_method(method):
-    return getattr(method, '__isabstractmethod__', False)
+if sys.version_info[0] < 3:
+    from support_py2 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
+else:
+    from support_py3 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
 
 
 #======================================================
@@ -272,8 +211,8 @@ class Sublp(object):
     @classmethod
     def _validate_string(cls, _string):
         """Validate input string."""
-        if not isinstance(_string, basestring):
-            raise TypeError("'_string' must be instance of basestring.")
+        if not isinstance(_string, str):
+            raise TypeError("'_string' must be instance of str.")
         return _string
 
 
@@ -307,61 +246,13 @@ class UnmatchedInputString(SublpException, ValueError):
     pass
 
 
-
-class ValueMeta(abc.ABCMeta):
-    """
-    ~ABCMeta, but allows __instancecheck__ to be cleanly overwritten.
-    @todo: Copy this into an interface-related package
-    """
-
-    def __instancecheck__(cls, instance):
-        if hasattr(cls, '__instancecheck__'):
-            return cls.__instancecheck__(instance)
-        else:
-            return abc.ABCMeta.__instancecheck__(cls, instance)
-
-    def __subclasscheck__(cls, subclass):
-        if hasattr(cls, '__subclasscheck__'):
-            return cls.__subclasscheck__(subclass)
-        else:
-            return abc.ABCMeta.__subclasscheck__(cls, subclass)
-
-
-class ExistingDirectory(str):
-    """
-    Non-instanced type-checking class (a VOG).
-    Used to confirm that
-    """
-    __metaclass__ = ValueMeta
-
-    @classmethod
-    def __instancecheck__(cls, instance):
-        if isinstance(instance, basestring):
-            if os.path.isdir(instance):
-                return True
-        return False
-
-class ExistingFile(str):
-    """
-    Non-instanced type-checking class (a VOG).
-    """
-    __metaclass__ = ValueMeta
-
-    @classmethod
-    def __instancecheck__(cls, instance):
-        if isinstance(instance, basestring):
-            if os.path.isfile(instance):
-                return True
-        return False
-
-ExistingPath = (ExistingDirectory, ExistingFile)
-
 #===================================================
 # Support Functions
 #===================================================
 def form_project_path(name, directory):
     """
-
+    @type: name: str
+    @type: directory: name
     """
     if not os.path.isdir(directory):
         raise ProjectsDirectoryNotFoundError(str.format(
