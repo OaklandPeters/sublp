@@ -7,14 +7,14 @@ import sublp
 class InterfaceTests(unittest.TestCase):
     def test_ProjectDispatchInterface(self):
         def meets_dispatcher(case):
-            return issubclass(case, sublp.ProjectDispatchInterface)
+            return issubclass(case, sublp.OpenProjectCaseInterface)
 
         for case in sublp.sublp.cases:
             self.assert_(meets_dispatcher(case))
-        # self.assert_(meets_dispatcher(sublp.OpenFromProjectFilePath))
-        # self.assert_(meets_dispatcher(sublp.OpenFromProjectName))
-        # self.assert_(meets_dispatcher(sublp.OpenFromDirectory))
-        # self.assert_(meets_dispatcher(sublp.OpenFromFallback))
+        # self.assert_(meets_dispatcher(sublp.OpenProjectFromFilePath))
+        # self.assert_(meets_dispatcher(sublp.OpenProjectFromName))
+        # self.assert_(meets_dispatcher(sublp.OpenProjectFromDirectory))
+        # self.assert_(meets_dispatcher(sublp.OpenProjectFallback))
 
     def test_ExistingDirectory(self):
         self.assert_(isinstance('test_bypath', sublp.ExistingDirectory))
@@ -31,10 +31,10 @@ class CaseMatchTests(unittest.TestCase):
 
     def setUp(self):
         self.projects_directory = "test_standard_projects_directory/"
-        self.case1 = sublp.OpenFromProjectFilePath
-        self.case2 = sublp.OpenFromProjectName
-        self.case3 = sublp.OpenFromDirectory
-        self.case4 = sublp.OpenFromFallback
+        self.case1 = sublp.OpenProjectFromFilePath
+        self.case2 = sublp.OpenProjectFromName
+        self.case3 = sublp.OpenProjectFromDirectory
+        self.case4 = sublp.OpenProjectFallback
 
     def matches1(self, name):
         return self.case1.dispatch_check(
@@ -98,9 +98,9 @@ class FormCommandTests(unittest.TestCase):
 
 
     def test_OpenFromProjectFilePath(self):
-        """OpenFromProjectFilePath.form_command()"""
+        """OpenProjectFromFilePath.form_command()"""
         _string = os.path.join("test_bypath", "bypath")
-        case = sublp.OpenFromProjectFilePath
+        case = sublp.OpenProjectFromFilePath
 
         self.assertEqual(case.dispatch_check(_string), True)
         expected = "subl --project test_bypath/bypath.sublime-project"
@@ -108,10 +108,10 @@ class FormCommandTests(unittest.TestCase):
         self.assertEqual(command, expected)
 
     def test_OpenFromProjectName(self):
-        """OpenFromProjectName.form_command()"""
+        """OpenProjectFromName.form_command()"""
         _string = "byname"
         projects_directory = "test_standard_projects_directory/"
-        case = sublp.OpenFromProjectName
+        case = sublp.OpenProjectFromName
 
         self.assertEqual(
             case.dispatch_check(_string, projects_directory=projects_directory),
@@ -125,9 +125,9 @@ class FormCommandTests(unittest.TestCase):
         self.assertEqual(command, expected)
 
     def test_OpenFromDirectory(self):
-        """OpenFromDirectory.form_command()"""
+        """OpenProjectFromDirectory.form_command()"""
         _string = "test_project_directory"
-        case = sublp.OpenFromDirectory
+        case = sublp.OpenProjectFromDirectory
 
         self.assertEqual(case.dispatch_check(_string), True)
         expected = "subl --project test_project_directory/bydir.sublime-project"
@@ -146,27 +146,27 @@ class DispatcherTests(unittest.TestCase):
     def test_file_path(self):
         self.compare_matcher(
             name=os.path.join("test_bypath", "bypath"),
-            case=sublp.OpenFromProjectFilePath
+            case=sublp.OpenProjectFromFilePath
         )
 
     def test_in_projects(self):
-        from sublp import OpenFromProjectName
-        OpenFromProjectName.projects_directory = "test_standard_projects_directory/"
+        from sublp import OpenProjectFromName
+        OpenProjectFromName.projects_directory = "test_standard_projects_directory/"
         self.compare_matcher(
             name="byname",
-            case=OpenFromProjectName
+            case=OpenProjectFromName
         )
 
     def test_in_directory(self):
         self.compare_matcher(
             name="test_project_directory",
-            case=sublp.OpenFromDirectory
+            case=sublp.OpenProjectFromDirectory
         )
 
     def test_fallback(self):
         self.compare_matcher(
             name="no_project_file",
-            case=sublp.OpenFromFallback
+            case=sublp.OpenProjectFallback
         )
 
 

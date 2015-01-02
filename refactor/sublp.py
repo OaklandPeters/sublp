@@ -2,7 +2,7 @@
 
 Refactorings to do in Eclipse:
 
-@todo: Copy docstring signature from ProjectDispatchInterface into cases.
+@todo: Copy docstring signature from OpenProjectCaseInterface into cases.
 @todo: Rename interface --> OpenProjectCaseInterface
 @todo: Rename cases to the style --> OpenProjectFrom{{}}
 @todo: Rename dispatch_check --> matches
@@ -24,7 +24,7 @@ import abc
 import subprocess
 
 
-class ProjectDispatchInterface(object):
+class OpenProjectCaseInterface(object):
     """
     Interface for dispatching on the input cases.
     """
@@ -48,7 +48,7 @@ class ProjectDispatchInterface(object):
 
     @classmethod
     def __subclasshook__(cls, subclass):
-        if cls is ProjectDispatchInterface:
+        if cls is OpenProjectCaseInterface:
             if meets(subclass, cls):
                 return True
         return NotImplemented
@@ -93,7 +93,7 @@ def is_abstract_method(method):
 #======================================================
 # Class Implementations (~Cases for dispatcher)
 #======================================================
-class OpenFromProjectFilePath(ProjectDispatchInterface):
+class OpenProjectFromFilePath(OpenProjectCaseInterface):
     """
     Input is path to project file.
     """
@@ -116,7 +116,7 @@ class OpenFromProjectFilePath(ProjectDispatchInterface):
         return sublime_project_command(path)
 
 
-class OpenFromProjectName(ProjectDispatchInterface):
+class OpenProjectFromName(OpenProjectCaseInterface):
     """
     Input is project file, in standard directory for sublime-project files.
     """
@@ -161,7 +161,7 @@ class OpenFromProjectName(ProjectDispatchInterface):
         return form_project_path(name, directory)
 
 
-class OpenFromDirectory(ProjectDispatchInterface):
+class OpenProjectFromDirectory(OpenProjectCaseInterface):
     """
     Open project file contained inside a directory.
     Only works if directory contains only one project file.
@@ -202,7 +202,7 @@ class OpenFromDirectory(ProjectDispatchInterface):
         return (len(project_files) == 1)
 
 
-class OpenFromFallback(ProjectDispatchInterface):
+class OpenProjectFallback(OpenProjectCaseInterface):
     """Fallback case, if no other cases trigger."""
     @classmethod
     def dispatch_check(cls, _string):
@@ -223,10 +223,10 @@ class sublp(object):
     Generic-function/dispatcher-function for sublp commandline function.
     """
     cases = [
-        OpenFromProjectFilePath,
-        OpenFromDirectory,
-        OpenFromProjectName,
-        OpenFromFallback
+        OpenProjectFromFilePath,
+        OpenProjectFromDirectory,
+        OpenProjectFromName,
+        OpenProjectFallback
     ]
 
     def __new__(cls, _string):
@@ -246,7 +246,7 @@ class sublp(object):
         """
         Finds case class which matches the input.
         @type: _string: str
-        @returns: ProjectDispatchInterface
+        @returns: OpenProjectCaseInterface
         """
         _string = cls._validate_string(_string)
 
@@ -262,7 +262,7 @@ class sublp(object):
     @classmethod
     def invoke(cls, case, _string):
         """
-        @type: case: ProjectDispatchInterface
+        @type: case: OpenProjectCaseInterface
         @returns: None
         """
         _string = cls._validate_string(_string)
