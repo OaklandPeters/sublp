@@ -26,7 +26,7 @@ class InterfaceTests(unittest.TestCase):
 
 class CaseMatchTests(unittest.TestCase):
     """
-    Test .dispatch_check() method for the cases.
+    Test .matches() method for the cases.
     """
 
     def setUp(self):
@@ -37,19 +37,19 @@ class CaseMatchTests(unittest.TestCase):
         self.case4 = sublp.OpenProjectFallback
 
     def matches1(self, name):
-        return self.case1.dispatch_check(
+        return self.case1.matches(
             name
         )
     def matches2(self, name):
-        return self.case2.dispatch_check(
+        return self.case2.matches(
             name, projects_directory=self.projects_directory
         )
     def matches3(self, name):
-        return self.case3.dispatch_check(
+        return self.case3.matches(
             name
         )
     def matches4(self, name):
-        return self.case4.dispatch_check(
+        return self.case4.matches(
             name
         )
 
@@ -81,7 +81,7 @@ class CaseMatchTests(unittest.TestCase):
         self.assertEquals(self.matches4(name), True)
 
     def test_fallback(self):
-        name ="no_project_file"
+        name = "no_project_file"
         self.assertEquals(self.matches1(name), False)
         self.assertEquals(self.matches2(name), False)
         self.assertEquals(self.matches3(name), False)
@@ -91,47 +91,47 @@ class CaseMatchTests(unittest.TestCase):
 
 class FormCommandTests(unittest.TestCase):
     """
-    Test .form_command() method for the cases.
+    Test .command() method for the cases.
     """
     def setUp(self):
         self.projects_directory = "test_standard_projects_directory/"
 
 
     def test_OpenFromProjectFilePath(self):
-        """OpenProjectFromFilePath.form_command()"""
+        """OpenProjectFromFilePath.command()"""
         _string = os.path.join("test_bypath", "bypath")
         case = sublp.OpenProjectFromFilePath
 
-        self.assertEqual(case.dispatch_check(_string), True)
+        self.assertEqual(case.matches(_string), True)
         expected = "subl --project test_bypath/bypath.sublime-project"
-        command = case.form_command(_string)
+        command = case.command(_string)
         self.assertEqual(command, expected)
 
     def test_OpenFromProjectName(self):
-        """OpenProjectFromName.form_command()"""
+        """OpenProjectFromName.command()"""
         _string = "byname"
         projects_directory = "test_standard_projects_directory/"
         case = sublp.OpenProjectFromName
 
         self.assertEqual(
-            case.dispatch_check(_string, projects_directory=projects_directory),
+            case.matches(_string, projects_directory=projects_directory),
             True
         )
         expected = ("subl --project test_standard_projects_directory"
                     "/byname.sublime-project")
-        command = case.form_command(
+        command = case.command(
             _string, projects_directory=projects_directory
         )
         self.assertEqual(command, expected)
 
     def test_OpenFromDirectory(self):
-        """OpenProjectFromDirectory.form_command()"""
+        """OpenProjectFromDirectory.command()"""
         _string = "test_project_directory"
         case = sublp.OpenProjectFromDirectory
 
-        self.assertEqual(case.dispatch_check(_string), True)
+        self.assertEqual(case.matches(_string), True)
         expected = "subl --project test_project_directory/bydir.sublime-project"
-        command = case.form_command(_string)
+        command = case.command(_string)
         self.assertEqual(command, expected)
 
 

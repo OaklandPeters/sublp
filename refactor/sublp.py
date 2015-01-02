@@ -3,10 +3,8 @@
 Refactorings to do in Eclipse:
 
 @todo: Copy docstring signature from OpenProjectCaseInterface into cases.
-@todo: Rename interface --> OpenProjectCaseInterface
-@todo: Rename cases to the style --> OpenProjectFrom{{}}
-@todo: Rename dispatch_check --> matches
-@todo: Rename form_command --> command
+@todo: Rename matches --> matches
+@todo: Rename command --> command
 @todo: Add fallback to dispatcher --> if no matches, call subl {_string}
 @todo: Add __call__ to cases - should open sublime appropriately
 
@@ -31,7 +29,7 @@ class OpenProjectCaseInterface(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def dispatch_check(cls, _string, *args, **kwargs):
+    def matches(cls, _string, *args, **kwargs):
         """
         @type: _string: str
         @returns: bool
@@ -39,7 +37,7 @@ class OpenProjectCaseInterface(object):
         return NotImplemented
 
     @abc.abstractmethod
-    def form_command(cls, _string, *args, **kwargs):
+    def command(cls, _string, *args, **kwargs):
         """
         @type: _string: str
         @returns: str
@@ -98,7 +96,7 @@ class OpenProjectFromFilePath(OpenProjectCaseInterface):
     Input is path to project file.
     """
     @classmethod
-    def dispatch_check(cls, _string):
+    def matches(cls, _string):
         """
         @type: _string: str
         @rtype: bool
@@ -107,7 +105,7 @@ class OpenProjectFromFilePath(OpenProjectCaseInterface):
         return is_sublime_project_file(path)
 
     @classmethod
-    def form_command(cls, _string):
+    def command(cls, _string):
         """
         @type: _string: str
         @rtype: str
@@ -126,7 +124,7 @@ class OpenProjectFromName(OpenProjectCaseInterface):
 
 
     @classmethod
-    def dispatch_check(cls, _string, projects_directory=None):
+    def matches(cls, _string, projects_directory=None):
         if projects_directory is None:
             projects_directory = cls.projects_directory
         return in_projects_directory(_string, projects_directory)
@@ -140,7 +138,7 @@ class OpenProjectFromName(OpenProjectCaseInterface):
 
 
     @classmethod
-    def form_command(cls, _string, projects_directory=None):
+    def command(cls, _string, projects_directory=None):
         """
         @type: _string: str
         @type: projects_directory: NoneType or str
@@ -167,11 +165,11 @@ class OpenProjectFromDirectory(OpenProjectCaseInterface):
     Only works if directory contains only one project file.
     """
     @classmethod
-    def dispatch_check(cls, _string):
+    def matches(cls, _string):
         return cls._has_single_project_file(_string)
 
     @classmethod
-    def form_command(cls, _string):
+    def command(cls, _string):
         """
         Assumes _has_single_project_file has already been run
         """
@@ -205,13 +203,13 @@ class OpenProjectFromDirectory(OpenProjectCaseInterface):
 class OpenProjectFallback(OpenProjectCaseInterface):
     """Fallback case, if no other cases trigger."""
     @classmethod
-    def dispatch_check(cls, _string):
+    def matches(cls, _string):
         if isinstance(_string, ExistingPath):
             return True
         return False
 
     @classmethod
-    def form_command(cls, _string):
+    def command(cls, _string):
         return "sublime "+_string
 
 
@@ -251,7 +249,7 @@ class sublp(object):
         _string = cls._validate_string(_string)
 
         for case in cls.cases:
-            if case.dispatch_check(_string):
+            if case.matches(_string):
                 return case
 
         raise UnmatchedInputString(str.format(
@@ -266,7 +264,7 @@ class sublp(object):
         @returns: None
         """
         _string = cls._validate_string(_string)
-        command = case.form_command(_string)
+        command = case.command(_string)
         subprocess.call(command, shell=True)
 
     @classmethod
