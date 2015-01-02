@@ -9,19 +9,19 @@ class InterfaceTests(unittest.TestCase):
         def meets_dispatcher(case):
             return issubclass(case, sublp.OpenProjectCaseInterface)
 
-        for case in sublp.sublp.cases:
-            self.assert_(meets_dispatcher(case))
-        # self.assert_(meets_dispatcher(sublp.OpenProjectFromFilePath))
-        # self.assert_(meets_dispatcher(sublp.OpenProjectFromName))
-        # self.assert_(meets_dispatcher(sublp.OpenProjectFromDirectory))
-        # self.assert_(meets_dispatcher(sublp.OpenProjectFallback))
+        for case in sublp.Sublp.cases:
+            self.assertTrue(meets_dispatcher(case))
+        # self.assertTrue(meets_dispatcher(sublp.OpenProjectFromFilePath))
+        # self.assertTrue(meets_dispatcher(sublp.OpenProjectFromName))
+        # self.assertTrue(meets_dispatcher(sublp.OpenProjectFromDirectory))
+        # self.assertTrue(meets_dispatcher(sublp.OpenProjectFallback))
 
     def test_ExistingDirectory(self):
-        self.assert_(isinstance('test_bypath', sublp.ExistingDirectory))
-        self.assert_(not isinstance('_test_bypath', sublp.ExistingDirectory))
+        self.assertTrue(isinstance('test_bypath', sublp.ExistingDirectory))
+        self.assertTrue(not isinstance('_test_bypath', sublp.ExistingDirectory))
 
-        self.assert_(os.path.exists('__init__.py'))
-        self.assert_(not isinstance('__init__.py', sublp.ExistingDirectory))
+        self.assertTrue(os.path.exists('__init__.py'))
+        self.assertTrue(not isinstance('__init__.py', sublp.ExistingDirectory))
 
 
 class CaseMatchTests(unittest.TestCase):
@@ -55,37 +55,37 @@ class CaseMatchTests(unittest.TestCase):
 
     def test_file_path(self):
         name = os.path.join("test_bypath", "bypath")
-        self.assertEquals(self.matches1(name), True)
-        self.assertEquals(self.matches2(name), False)
-        self.assertEquals(self.matches3(name), False)
-        self.assertEquals(self.matches4(name), False)
+        self.assertEqual(self.matches1(name), True)
+        self.assertEqual(self.matches2(name), False)
+        self.assertEqual(self.matches3(name), False)
+        self.assertEqual(self.matches4(name), False)
 
         name = os.path.join("test_bypath", "bypath.sublime-project")
-        self.assertEquals(self.matches1(name), True)
-        self.assertEquals(self.matches2(name), False)
-        self.assertEquals(self.matches3(name), False)
-        self.assertEquals(self.matches4(name), True)
+        self.assertEqual(self.matches1(name), True)
+        self.assertEqual(self.matches2(name), False)
+        self.assertEqual(self.matches3(name), False)
+        self.assertEqual(self.matches4(name), True)
 
     def test_in_projects(self):
         name = "byname"
-        self.assertEquals(self.matches1(name), False)
-        self.assertEquals(self.matches2(name), True)
-        self.assertEquals(self.matches3(name), False)
-        self.assertEquals(self.matches4(name), False)
+        self.assertEqual(self.matches1(name), False)
+        self.assertEqual(self.matches2(name), True)
+        self.assertEqual(self.matches3(name), False)
+        self.assertEqual(self.matches4(name), False)
 
     def test_in_directory(self):
         name = "test_project_directory"
-        self.assertEquals(self.matches1(name), False)
-        self.assertEquals(self.matches2(name), False)
-        self.assertEquals(self.matches3(name), True)
-        self.assertEquals(self.matches4(name), True)
+        self.assertEqual(self.matches1(name), False)
+        self.assertEqual(self.matches2(name), False)
+        self.assertEqual(self.matches3(name), True)
+        self.assertEqual(self.matches4(name), True)
 
     def test_fallback(self):
-        name = "no_project_file"
-        self.assertEquals(self.matches1(name), False)
-        self.assertEquals(self.matches2(name), False)
-        self.assertEquals(self.matches3(name), False)
-        self.assertEquals(self.matches4(name), True)
+        name ="no_project_file"
+        self.assertEqual(self.matches1(name), False)
+        self.assertEqual(self.matches2(name), False)
+        self.assertEqual(self.matches3(name), False)
+        self.assertEqual(self.matches4(name), True)
 
 
 
@@ -140,7 +140,16 @@ class FormCommandTests(unittest.TestCase):
 class DispatcherTests(unittest.TestCase):
 
     def compare_matcher(self, name, case):
-        result = sublp.sublp.match(name)
+
+
+        print()
+        print(case)
+        print()
+        import pdb
+        pdb.set_trace()
+        print()
+
+        result = sublp.Sublp.match(name)
         self.assertEqual(result, case)
 
     def test_file_path(self):

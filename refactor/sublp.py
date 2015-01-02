@@ -15,6 +15,8 @@ Refactorings to do in Eclipse:
 @todo: Refactor out --> cases.py
 @todo: Refactor out --> support.py
 @todo: Write __all__ for each file
+
+@todo: Make Python3 compatible version: big issue - metaclasses in Python3: (metaclass=ValueMeta)
 """
 
 import os
@@ -29,7 +31,7 @@ class OpenProjectCaseInterface(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def matches(cls, _string, *args, **kwargs):
+    def matches(cls, _string, *args, **kwargs):  # pylint: disable=no-self-argument
         """
         @type: _string: str
         @returns: bool
@@ -37,7 +39,7 @@ class OpenProjectCaseInterface(object):
         return NotImplemented
 
     @abc.abstractmethod
-    def command(cls, _string, *args, **kwargs):
+    def command(cls, _string, *args, **kwargs):  # pylint: disable=no-self-argument
         """
         @type: _string: str
         @returns: str
@@ -216,7 +218,7 @@ class OpenProjectFallback(OpenProjectCaseInterface):
 #===================================================
 # Dispatcher
 #===================================================
-class sublp(object):
+class Sublp(object):
     """
     Generic-function/dispatcher-function for sublp commandline function.
     """
