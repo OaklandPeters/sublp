@@ -1,6 +1,14 @@
 """
 Exceptions raised in the sublp package.
 """
+
+__all__ = [
+    'SublpException',
+    'ProjectNotFoundError',
+    'ProjectsDirectoryNotFoundError',
+    'UnmatchedInputString'
+]
+
 class SublpException(Exception):
     """Root exception type for sublp module."""
     pass

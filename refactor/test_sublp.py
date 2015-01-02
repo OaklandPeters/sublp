@@ -14,10 +14,6 @@ class InterfaceTests(unittest.TestCase):
 
         for case in sublp.Sublp.cases:
             self.assertTrue(meets_dispatcher(case))
-        # self.assertTrue(meets_dispatcher(dispatch_cases.OpenProjectFromFilePath))
-        # self.assertTrue(meets_dispatcher(dispatch_cases.OpenProjectFromName))
-        # self.assertTrue(meets_dispatcher(dispatch_cases.OpenProjectFromDirectory))
-        # self.assertTrue(meets_dispatcher(dispatch_cases.OpenProjectFallback))
 
     def test_ExistingDirectory(self):
         self.assertTrue(isinstance('test_bypath', interfaces.ExistingDirectory))

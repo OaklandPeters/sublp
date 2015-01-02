@@ -7,10 +7,13 @@ import os
 import interfaces
 import support
 
-# if sys.version_info[0] < 3:
-#     from py2 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
-# else:
-#     from py3 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
+__all__ = [
+    'OpenProjectFromFilePath',
+    'OpenProjectFromName',
+    'OpenProjectFromDirectory',
+    'OpenProjectFallback'
+]
+
 
 class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
     """
@@ -22,6 +25,7 @@ class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
         @type: _string: str
         @rtype: bool
         """
+
         path = support.ensure_end(_string, '.sublime-project')
         return support.is_sublime_project_file(path)
 
@@ -31,6 +35,7 @@ class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
         @type: _string: str
         @rtype: str
         """
+
         path = support.ensure_end(_string, '.sublime-project')
         return support.sublime_project_command(path)
 
@@ -46,12 +51,22 @@ class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
 
     @classmethod
     def matches(cls, _string, projects_directory=None):
+        """
+        @type: _string: str
+        @returns: bool
+        """
+
         if projects_directory is None:
             projects_directory = cls.projects_directory
         return support.in_projects_directory(_string, projects_directory)
 
     @classmethod
     def get_projects_directory(cls, projects_directory=None):
+        """
+        @type: projects_directory: str or None
+        @rtype: str
+        """
+
         if projects_directory is None:
             return cls.projects_directory
         else:
@@ -74,6 +89,9 @@ class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
     def project_path(cls, name, directory=None):
         """
         Assumes project directory exists
+        @type: name: str
+        @type: directory: str or None
+        @rtype: str
         """
         if directory is None:
             directory = cls.projects_directory
@@ -87,13 +105,23 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
     """
     @classmethod
     def matches(cls, _string):
+        """
+        Predicate. Does input string match this case?
+        @type: _string: str
+        @returns: bool
+
+        """
         return cls._has_single_project_file(_string)
 
     @classmethod
     def command(cls, _string):
         """
-        Assumes _has_single_project_file has already been run
+        Generate bash command string.
+        Assumes _has_single_project_file has already been run.
+        @type: _string: str
+        @rtype: str
         """
+
         project_file_path = cls._find_project_files(_string)[0]
         return support.sublime_project_command(project_file_path)
 
@@ -105,6 +133,7 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
         @type: _string: str
         @rtype: list of str
         """
+
         if isinstance(_string, interfaces.ExistingDirectory):
             project_names = support.find_project_files(_string)
             project_paths = list(os.path.join(_string, name) for name in project_names)
@@ -117,18 +146,32 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
         """
         Predciate. Does directory contain exactly one project file?
         """
+
         project_files = cls._find_project_files(directory)
         return (len(project_files) == 1)
 
 
 class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
-    """Fallback case, if no other cases trigger."""
+    """
+    Fallback case, if no other cases trigger.
+    """
+
     @classmethod
     def matches(cls, _string):
+        """
+        @type: _string: str
+        @returns: bool
+        """
+
         if isinstance(_string, interfaces.ExistingPath):
             return True
         return False
 
     @classmethod
     def command(cls, _string):
+        """
+        @type: _string: str
+        @rtype: str
+        """
+
         return "sublime "+_string

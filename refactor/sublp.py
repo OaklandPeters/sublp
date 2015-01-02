@@ -1,4 +1,7 @@
 """
+Contains the dispatcher function - to be called by .sh
+command-line scripts.
+
 @todo: Copy docstring signature from OpenProjectCaseInterface into cases.
 @todo: Add __call__ to cases - should open sublime appropriately
 
@@ -18,14 +21,10 @@ import dispatch_cases
 import support
 import errors
 import interfaces
-# if sys.version_info[0] < 3:
-#     from py2 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
-# else:
-#     from py3 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
 
-
-
-
+__all__ = [
+    'Sublp'
+]
 
 #===================================================
 # Dispatcher
@@ -46,10 +45,12 @@ class Sublp(object):
 
     @classmethod
     def __call__(cls, _string):
-        """Primary flow-control.
+        """
+        Primary flow-control.
         @type: _string: str
         @rtype: None
         """
+
         case = cls.match(_string)
         cls.invoke(case, _string)
 
@@ -58,8 +59,9 @@ class Sublp(object):
         """
         Finds case class which matches the input.
         @type: _string: str
-        @returns: OpenProjectCaseInterface
+        @rtype: OpenProjectCaseInterface
         """
+
         _string = cls._validate_string(_string)
 
         for case in cls.cases:
@@ -75,26 +77,22 @@ class Sublp(object):
     def invoke(cls, case, _string):
         """
         @type: case: OpenProjectCaseInterface
-        @returns: None
+        @type: _string: str
+        @rtype: None
         """
+
         _string = cls._validate_string(_string)
         command = case.command(_string)
         subprocess.call(command, shell=True)
 
     @classmethod
     def _validate_string(cls, _string):
-        """Validate input string."""
+        """
+        Validate input string.
+        @type: _string: str
+        @rtype: str
+        """
+
         if not isinstance(_string, str):
             raise TypeError("'_string' must be instance of str.")
         return _string
-
-
-#===================================================
-# Exceptions
-#===================================================
-
-
-
-#===================================================
-# Support Functions
-#===================================================

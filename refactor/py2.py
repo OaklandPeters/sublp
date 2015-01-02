@@ -5,6 +5,12 @@ Python2-specific version of support functions.
 import abc
 import os
 
+__all__ = [
+    'ExistingDirectory',
+    'ExistingPath',
+    'ExistingFile',
+    'OpenProjectCaseInterface'
+]
 
 class OpenProjectCaseInterface(object):
     """

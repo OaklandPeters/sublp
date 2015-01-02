@@ -5,8 +5,22 @@ import os
 
 import errors
 
+__all__ = [
+    "ensure_end",
+    "errors",
+    "find_project_files",
+    "form_project_path",
+    "has_project_file",
+    "in_projects_directory",
+    "is_sublime_project_file",
+    "os",
+    "sublime_project_command",
+    "to_paths"
+]
+
 def form_project_path(name, directory):
     """
+    Create sublime project path from file name and directory.
     @type: name: str
     @type: directory: name
     """
@@ -19,6 +33,7 @@ def form_project_path(name, directory):
 
 def sublime_project_command(path):
     """
+    Form bash command to open a sublime project.
     @type: path: str
     @returns: str
     """
@@ -37,6 +52,7 @@ def sublime_project_command(path):
 
 def is_sublime_project_file(path):
     """
+    Does path refer to a sublime project file?
     @type: path: str
     @returns: bool
     """
@@ -49,6 +65,7 @@ def is_sublime_project_file(path):
 
 def in_projects_directory(name, directory):
     """
+    Is {name}.sublime-project contained in directory?
     @type: name: str - project name, with or without extension
     @type: directory: str - project directory
     @returns: bool
@@ -64,6 +81,7 @@ def in_projects_directory(name, directory):
 
 def ensure_end(haystack, ending):
     """
+    Ensure that string ends with specific ending.
     @type: haystack: str
     @type: ending: str
     @returns: str
@@ -75,6 +93,7 @@ def ensure_end(haystack, ending):
 
 def find_project_files(directory):
     """
+    Return .sublime-project files contained in directory.
     @type: directory: str
     @rtype: iter of str
     """
@@ -84,6 +103,7 @@ def find_project_files(directory):
 
 def to_paths(iterable, prefix=None):
     """
+    Convert file names to absolute paths.
     @type: iterable: iter of str
     @param: iterable: File names or partial paths of files.
     @type: prefix: str or None
