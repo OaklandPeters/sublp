@@ -22,7 +22,8 @@ def form_project_path(name, directory):
     """
     Create sublime project path from file name and directory.
     @type: name: str
-    @type: directory: name
+    @type: directory: str
+    @rtype: str
     """
     if not os.path.isdir(directory):
         raise errors.ProjectsDirectoryNotFoundError(str.format(
@@ -33,9 +34,9 @@ def form_project_path(name, directory):
 
 def sublime_project_command(path):
     """
-    Form bash command to open a sublime project.
+    Form bash command to open a Sublime Text project.
     @type: path: str
-    @returns: str
+    @rtype: str
     """
     project_path = ensure_end(path, '.sublime-project')
     if not os.path.isfile(project_path):
@@ -49,6 +50,16 @@ def sublime_project_command(path):
     )
     return command
 
+def sublime_basic_command(path):
+    """
+    Form bash command to open file in Sublime Text.
+    @type: path: str
+    @rtype: str
+    """
+    return str.format(
+        "subl {path}",
+        path=path
+    )
 
 def is_sublime_project_file(path):
     """

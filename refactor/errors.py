@@ -23,10 +23,17 @@ class ProjectNotFoundError(SublpException, IOError):
 
 class ProjectsDirectoryNotFoundError(SublpException, IOError):
     """
-    Raised by sublp when a project directory can not be found.
+    Raised by sublp functions when a project directory can not be found.
     """
     pass
 
+
+class NoProjectFilesFoundError(SublpException):
+    """
+    Raised by sublp functions when attempting to open a projects file
+    (based on a directory which should contain one or more projects files)
+    but no projects files were found.
+    """
 
 class UnmatchedInputString(SublpException, ValueError):
     """

@@ -6,6 +6,7 @@ import os
 
 import interfaces
 import support
+import errors
 
 __all__ = [
     'OpenProjectFromFilePath',
@@ -19,8 +20,8 @@ class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
     """
     Input is path to project file.
     """
-    @classmethod
-    def matches(cls, _string):
+
+    def matches(self, _string):
         """
         @type: _string: str
         @rtype: bool
@@ -29,8 +30,7 @@ class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
         path = support.ensure_end(_string, '.sublime-project')
         return support.is_sublime_project_file(path)
 
-    @classmethod
-    def command(cls, _string):
+    def command(self, _string):
         """
         @type: _string: str
         @rtype: str
@@ -42,60 +42,46 @@ class OpenProjectFromFilePath(interfaces.OpenProjectCaseInterface):
 
 class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
     """
-    Input is project file, in standard directory for sublime-project files.
+    Attempt to open a project file by looking in a standardized location
+    for all project files (usually located in the user's
+    SublimeText packages directory).
     """
-    projects_directory = (
-        "~/Library/Application Support/Sublime Text 3/Packages/User/Projects"
-    )
 
+    class Defaults(object):
+        projects_directory = (
+            "~/Library/Application Support/Sublime Text 3/Packages/User/Projects"
+        )
 
-    @classmethod
-    def matches(cls, _string, projects_directory=None):
+    def __init__(self, projects_directory=None):
+        """
+        Input is project file, in standard directory for sublime-project files.
+        """
+
+        if projects_directory is None:
+            self.projects_directory = self.Defaults.projects_directory
+        else:
+            self.projects_directory = projects_directory
+
+    def matches(self, _string, projects_directory=None):
         """
         @type: _string: str
         @returns: bool
         """
 
         if projects_directory is None:
-            projects_directory = cls.projects_directory
+            projects_directory = self.projects_directory
         return support.in_projects_directory(_string, projects_directory)
 
-    @classmethod
-    def get_projects_directory(cls, projects_directory=None):
-        """
-        @type: projects_directory: str or None
-        @rtype: str
-        """
-
-        if projects_directory is None:
-            return cls.projects_directory
-        else:
-            return projects_directory
-
-
-    @classmethod
-    def command(cls, _string, projects_directory=None):
+    def command(self, _string, projects_directory=None):
         """
         @type: _string: str
         @type: projects_directory: NoneType or str
         @rtype: str
         """
         if projects_directory is None:
-            projects_directory = cls.projects_directory
+            projects_directory = self.projects_directory
         path = os.path.join(projects_directory, _string)
         return support.sublime_project_command(path)
-
-    @classmethod
-    def project_path(cls, name, directory=None):
-        """
-        Assumes project directory exists
-        @type: name: str
-        @type: directory: str or None
-        @rtype: str
-        """
-        if directory is None:
-            directory = cls.projects_directory
-        return support.form_project_path(name, directory)
 
 
 class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
@@ -103,30 +89,34 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
     Open project file contained inside a directory.
     Only works if directory contains only one project file.
     """
-    @classmethod
-    def matches(cls, _string):
+
+    def matches(self, _string):
         """
         Predicate. Does input string match this case?
         @type: _string: str
         @returns: bool
 
         """
-        return cls._has_single_project_file(_string)
+        return self._has_single_project_file(_string)
 
-    @classmethod
-    def command(cls, _string):
+    def command(self, _string):
         """
         Generate bash command string.
         Assumes _has_single_project_file has already been run.
         @type: _string: str
         @rtype: str
         """
-
-        project_file_path = cls._find_project_files(_string)[0]
+        project_files = self._find_project_files(_string)
+        try:
+            project_file_path = project_files[0]
+        except IndexError:
+            raise errors.NoProjectFilesFoundError(str.format(
+                "No project files found inside directory: {0}",
+                _string
+            ))
         return support.sublime_project_command(project_file_path)
 
-    @classmethod
-    def _find_project_files(cls, _string):
+    def _find_project_files(self, _string):
         """
         Return list of all project files in _string.
         If _string is not a directory, return empty list.
@@ -141,13 +131,12 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
         else:
             return []
 
-    @classmethod
-    def _has_single_project_file(cls, directory):
+    def _has_single_project_file(self, directory):
         """
         Predciate. Does directory contain exactly one project file?
         """
 
-        project_files = cls._find_project_files(directory)
+        project_files = self._find_project_files(directory)
         return (len(project_files) == 1)
 
 
@@ -156,8 +145,7 @@ class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
     Fallback case, if no other cases trigger.
     """
 
-    @classmethod
-    def matches(cls, _string):
+    def matches(self, _string):
         """
         @type: _string: str
         @returns: bool
@@ -167,11 +155,10 @@ class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
             return True
         return False
 
-    @classmethod
-    def command(cls, _string):
+    def command(self, _string):
         """
         @type: _string: str
         @rtype: str
         """
 
-        return "sublime "+_string
+        return support.sublime_basic_command(_string)

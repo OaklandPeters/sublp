@@ -36,10 +36,19 @@ class OpenProjectCaseInterface(object):
 
     @classmethod
     def __subclasshook__(cls, subclass):
+        """
+        Mixin method
+        """
         if cls is OpenProjectCaseInterface:
             if meets(subclass, cls):
                 return True
         return NotImplemented
+
+    def __init__(self, *positional, **keywords):
+        """
+        Default implementation. Can be overridden to add properties.
+        """
+        pass
 
 
 def meets(obj, interface):

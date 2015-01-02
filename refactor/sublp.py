@@ -1,16 +1,6 @@
 """
 Contains the dispatcher function - to be called by .sh
 command-line scripts.
-
-@todo: Copy docstring signature from OpenProjectCaseInterface into cases.
-@todo: Add __call__ to cases - should open sublime appropriately
-
-@todo: Write __all__ for each file
-
-@todo: Make cases instancable
-@todo: Make cases instanced inside Sublp class
-@todo: Make OpenProjectFromName accept project directory as argument.
-@todo: Change importation to proper relative imports (requires changing test_sublp.py first)
 """
 
 import os
@@ -26,19 +16,30 @@ __all__ = [
     'Sublp'
 ]
 
-#===================================================
-# Dispatcher
-#===================================================
 class Sublp(object):
     """
     Generic-function/dispatcher-function for sublp commandline function.
     """
+    # Instance case objects
+    OpenProjectFromFilePath = dispatch_cases.OpenProjectFromFilePath()
+    OpenProjectFromDirectory = dispatch_cases.OpenProjectFromDirectory()
+    OpenProjectFromName = dispatch_cases.OpenProjectFromName()
+    OpenProjectFallback = dispatch_cases.OpenProjectFallback()
+
     cases = [
-        dispatch_cases.OpenProjectFromFilePath,
-        dispatch_cases.OpenProjectFromDirectory,
-        dispatch_cases.OpenProjectFromName,
-        dispatch_cases.OpenProjectFallback
+        OpenProjectFromFilePath,
+        OpenProjectFromDirectory,
+        OpenProjectFromName,
+        OpenProjectFallback
     ]
+    #fallback = OpenProjectFallback
+
+    # cases = [
+    #     dispatch_cases.OpenProjectFromFilePath(),
+    #     dispatch_cases.OpenProjectFromDirectory(),
+    #     dispatch_cases.OpenProjectFromName(),
+    #     dispatch_cases.OpenProjectFallback()
+    # ]
 
     def __new__(cls, _string):
         return cls.__call__(_string)

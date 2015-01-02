@@ -40,6 +40,12 @@ class OpenProjectCaseInterface(object, metaclass=abc.ABCMeta):
                 return True
         return NotImplemented
 
+    def __init__(self, *positional, **keywords):
+        """
+        Default implementation. Can be overridden to add properties.
+        """
+        pass
+
 
 def meets(obj, interface):
     """
