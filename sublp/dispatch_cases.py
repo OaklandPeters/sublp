@@ -7,6 +7,7 @@ import os
 import interfaces
 import support
 import errors
+import configuration
 
 __all__ = [
     'OpenProjectFromFilePath',
@@ -48,15 +49,12 @@ class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
     """
 
     class Defaults(object):
-        projects_directory = (
-            "~/Library/Application Support/Sublime Text 3/Packages/User/Projects"
-        )
+        projects_directory = configuration.PROJECTS_DIRECTORY
 
     def __init__(self, projects_directory=None):
         """
         Input is project file, in standard directory for sublime-project files.
         """
-
         if projects_directory is None:
             self.projects_directory = self.Defaults.projects_directory
         else:
@@ -67,10 +65,11 @@ class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
         @type: _string: str
         @returns: bool
         """
-
         if projects_directory is None:
             projects_directory = self.projects_directory
-        return support.in_projects_directory(_string, projects_directory)
+        name = support.ensure_end(_string, '.sublime-project')
+        return (name in self._dir_contents())
+#        return support.in_projects_directory(_string, projects_directory)
 
     def command(self, _string, projects_directory=None):
         """
@@ -83,6 +82,16 @@ class OpenProjectFromName(interfaces.OpenProjectCaseInterface):
         path = os.path.join(projects_directory, _string)
         return support.sublime_project_command(path)
 
+    def _dir_contents(self):
+        """
+        List contents of projects_directory.
+        @rtype: list of str
+        """
+        if self.projects_directory is not None:
+            if os.path.exists(self.projects_directory):
+                return os.listdir(self.projects_directory)
+        # Fallthrough condition
+        return []
 
 class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
     """

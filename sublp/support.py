@@ -45,7 +45,7 @@ def sublime_project_command(path):
             project_path
         ))
     command = str.format(
-        "subl --project {project_path}",
+        "subl --project \"{project_path}\"",
         project_path=project_path
     )
     return command
@@ -57,7 +57,7 @@ def sublime_basic_command(path):
     @rtype: str
     """
     return str.format(
-        "subl {path}",
+        "subl \"{path}\"",
         path=path
     )
 

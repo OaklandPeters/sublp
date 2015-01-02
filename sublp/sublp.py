@@ -11,6 +11,7 @@ import dispatch_cases
 import support
 import errors
 import interfaces
+import configuration
 
 __all__ = [
     'Sublp'
@@ -23,7 +24,9 @@ class Sublp(object):
     # Instance case objects
     OpenProjectFromFilePath = dispatch_cases.OpenProjectFromFilePath()
     OpenProjectFromDirectory = dispatch_cases.OpenProjectFromDirectory()
-    OpenProjectFromName = dispatch_cases.OpenProjectFromName()
+    OpenProjectFromName = dispatch_cases.OpenProjectFromName(
+        projects_directory=configuration.PROJECTS_DIRECTORY
+    )
     OpenProjectFallback = dispatch_cases.OpenProjectFallback()
 
     cases = [
