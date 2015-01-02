@@ -122,9 +122,6 @@ class FormCommandTests(unittest.TestCase):
         self.assertEqual(case.matches(_string), True)
         expected = ("subl --project test_standard_projects_directory"
                     "/byname.sublime-project")
-        #command = case.command(
-        #    _string, projects_directory=projects_directory
-        #)
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -144,9 +141,9 @@ class FormCommandTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFallback()
 
         self.assertEqual(case.matches(_string), True)
-        expected = "subl "
-
-
+        expected = "subl no_project_file"
+        command = case.command(_string)
+        self.assertEqual(command, expected)
 
 
 class DispatcherTests(unittest.TestCase):
@@ -162,8 +159,6 @@ class DispatcherTests(unittest.TestCase):
         )
 
     def test_in_projects(self):
-        #from dispatch_cases import OpenProjectFromName
-        #OpenProjectFromName.projects_directory = "test_standard_projects_directory/"
         case = sublp.Sublp.OpenProjectFromName
         case.projects_directory = "test_standard_projects_directory"
         self.compare_matcher(
@@ -186,5 +181,3 @@ class DispatcherTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-

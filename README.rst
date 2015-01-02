@@ -1,0 +1,52 @@
+sublp
+============
+
+
+Synopsis
+---------
+Convenience Bash command-line function for opening SublimeText projects.
+Very similar to `subl {PATH}` command, except looks for a
+`{PATH}.sublime-project` file in several standard locations. If not found,
+then it falls back to the behavior of `subl`.
+
+Examples
+---------
+.. code::
+
+    sublp {PROJECT-FILE-PATH}
+    sublp {DIRECTORY-WITH-PROJECT-FILE}
+
+
+Installing
+-----------
+Install this package, and then add to your .bash_profile::
+
+    alias sublp='python /path/to/project/sublp.py'
+
+
+Project File Locations
+-----------------------
+Runs one of four cases, based on the single argument to `sublp {1}`:
+
+(1) Looks for a project file named by the argument.
+(2) Looks for a project file, inside a directory named by the argument.
+(3) Looks for a file of that name in the "standard" projects directory.
+(4) If none of the above
+
+Standard Projects Directory
+----------------------------
+By default this is: "~/Library/Application Support/Sublime Text 3/Packages/User/Projects". Currently this has to be specified inside sublp.py - but in the future
+this will be able to be specified in some configuration file.
+
+Tests
+------
+test_sublp.py runs Python unittests on the invernal/private Python functions.
+test_invoke.py is intended to be ran 'manually' by commandline to test for '.invoke' commands which actually open SublimeText windows.
+
+Contributors
+------------
+Oakland John Peters.
+
+License
+-----------
+Copyright MIT 2014.

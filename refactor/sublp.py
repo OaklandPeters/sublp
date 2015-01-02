@@ -29,17 +29,9 @@ class Sublp(object):
     cases = [
         OpenProjectFromFilePath,
         OpenProjectFromDirectory,
-        OpenProjectFromName,
-        OpenProjectFallback
+        OpenProjectFromName
     ]
-    #fallback = OpenProjectFallback
-
-    # cases = [
-    #     dispatch_cases.OpenProjectFromFilePath(),
-    #     dispatch_cases.OpenProjectFromDirectory(),
-    #     dispatch_cases.OpenProjectFromName(),
-    #     dispatch_cases.OpenProjectFallback()
-    # ]
+    fallback = OpenProjectFallback
 
     def __new__(cls, _string):
         return cls.__call__(_string)
@@ -69,6 +61,10 @@ class Sublp(object):
             if case.matches(_string):
                 return case
 
+        if hasattr(cls, 'fallback'):
+            if cls.fallback.matches(_string):
+                return cls.fallback
+
         raise errors.UnmatchedInputString(str.format(
             "Cannot find an appropriate sublime project file for '{0}'.",
             _string
@@ -97,3 +93,7 @@ class Sublp(object):
         if not isinstance(_string, str):
             raise TypeError("'_string' must be instance of str.")
         return _string
+
+
+if __name__ == "__main__":
+    Sublp(sys.argv[1])
