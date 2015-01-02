@@ -1,157 +1,30 @@
 """
-
-Refactorings to do in Eclipse:
-
 @todo: Copy docstring signature from OpenProjectCaseInterface into cases.
-@todo: Rename matches --> matches
-@todo: Rename command --> command
-@todo: Add fallback to dispatcher --> if no matches, call subl {_string}
 @todo: Add __call__ to cases - should open sublime appropriately
 
-
-@todo: Refactor out --> interfaces.py
-@todo: Refactor out --> errors.py
-@todo: Refactor out --> dispatcher.py
-@todo: Refactor out --> cases.py
-@todo: Refactor out --> support.py
 @todo: Write __all__ for each file
 
-@todo: Make Python3 compatible version: big issue - metaclasses in Python3: (metaclass=ValueMeta)
+@todo: Make cases instancable
+@todo: Make cases instanced inside Sublp class
+@todo: Make OpenProjectFromName accept project directory as argument.
+@todo: Change importation to proper relative imports (requires changing test_sublp.py first)
 """
 
 import os
 import subprocess
 import sys
 
-if sys.version_info[0] < 3:
-    from support_py2 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
-else:
-    from support_py3 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
+import dispatch_cases
+import support
+import errors
+import interfaces
+# if sys.version_info[0] < 3:
+#     from py2 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
+# else:
+#     from py3 import (ExistingDirectory, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
 
 
-#======================================================
-# Class Implementations (~Cases for dispatcher)
-#======================================================
-class OpenProjectFromFilePath(OpenProjectCaseInterface):
-    """
-    Input is path to project file.
-    """
-    @classmethod
-    def matches(cls, _string):
-        """
-        @type: _string: str
-        @rtype: bool
-        """
-        path = ensure_end(_string, '.sublime-project')
-        return is_sublime_project_file(path)
 
-    @classmethod
-    def command(cls, _string):
-        """
-        @type: _string: str
-        @rtype: str
-        """
-        path = ensure_end(_string, '.sublime-project')
-        return sublime_project_command(path)
-
-
-class OpenProjectFromName(OpenProjectCaseInterface):
-    """
-    Input is project file, in standard directory for sublime-project files.
-    """
-    projects_directory = (
-        "~/Library/Application Support/Sublime Text 3/Packages/User/Projects"
-    )
-
-
-    @classmethod
-    def matches(cls, _string, projects_directory=None):
-        if projects_directory is None:
-            projects_directory = cls.projects_directory
-        return in_projects_directory(_string, projects_directory)
-
-    @classmethod
-    def get_projects_directory(cls, projects_directory=None):
-        if projects_directory is None:
-            return cls.projects_directory
-        else:
-            return projects_directory
-
-
-    @classmethod
-    def command(cls, _string, projects_directory=None):
-        """
-        @type: _string: str
-        @type: projects_directory: NoneType or str
-        @rtype: str
-        """
-        if projects_directory is None:
-            projects_directory = cls.projects_directory
-        path = os.path.join(projects_directory, _string)
-        return sublime_project_command(path)
-
-    @classmethod
-    def project_path(cls, name, directory=None):
-        """
-        Assumes project directory exists
-        """
-        if directory is None:
-            directory = cls.projects_directory
-        return form_project_path(name, directory)
-
-
-class OpenProjectFromDirectory(OpenProjectCaseInterface):
-    """
-    Open project file contained inside a directory.
-    Only works if directory contains only one project file.
-    """
-    @classmethod
-    def matches(cls, _string):
-        return cls._has_single_project_file(_string)
-
-    @classmethod
-    def command(cls, _string):
-        """
-        Assumes _has_single_project_file has already been run
-        """
-        project_file_path = cls._find_project_files(_string)[0]
-        return sublime_project_command(project_file_path)
-
-    @classmethod
-    def _find_project_files(cls, _string):
-        """
-        Return list of all project files in _string.
-        If _string is not a directory, return empty list.
-        @type: _string: str
-        @rtype: list of str
-        """
-        if isinstance(_string, ExistingDirectory):
-            project_names = find_project_files(_string)
-            project_paths = list(os.path.join(_string, name) for name in project_names)
-            return project_paths
-        else:
-            return []
-
-    @classmethod
-    def _has_single_project_file(cls, directory):
-        """
-        Predciate. Does directory contain exactly one project file?
-        """
-        project_files = cls._find_project_files(directory)
-        return (len(project_files) == 1)
-
-
-class OpenProjectFallback(OpenProjectCaseInterface):
-    """Fallback case, if no other cases trigger."""
-    @classmethod
-    def matches(cls, _string):
-        if isinstance(_string, ExistingPath):
-            return True
-        return False
-
-    @classmethod
-    def command(cls, _string):
-        return "sublime "+_string
 
 
 #===================================================
@@ -162,10 +35,10 @@ class Sublp(object):
     Generic-function/dispatcher-function for sublp commandline function.
     """
     cases = [
-        OpenProjectFromFilePath,
-        OpenProjectFromDirectory,
-        OpenProjectFromName,
-        OpenProjectFallback
+        dispatch_cases.OpenProjectFromFilePath,
+        dispatch_cases.OpenProjectFromDirectory,
+        dispatch_cases.OpenProjectFromName,
+        dispatch_cases.OpenProjectFallback
     ]
 
     def __new__(cls, _string):
@@ -193,7 +66,7 @@ class Sublp(object):
             if case.matches(_string):
                 return case
 
-        raise UnmatchedInputString(str.format(
+        raise errors.UnmatchedInputString(str.format(
             "Cannot find an appropriate sublime project file for '{0}'.",
             _string
         ))
@@ -219,132 +92,9 @@ class Sublp(object):
 #===================================================
 # Exceptions
 #===================================================
-class SublpException(Exception):
-    """Root exception type for sublp module."""
-    pass
 
-
-class ProjectNotFoundError(SublpException, IOError):
-    """
-    Raised by sublp when a project file can not be found.
-    """
-    pass
-
-
-class ProjectsDirectoryNotFoundError(SublpException, IOError):
-    """
-    Raised by sublp when a project directory can not be found.
-    """
-    pass
-
-
-class UnmatchedInputString(SublpException, ValueError):
-    """
-    Rasied when input string cannot be successfully matched against
-    any of the cases known by the dispatcher.
-    """
-    pass
 
 
 #===================================================
 # Support Functions
 #===================================================
-def form_project_path(name, directory):
-    """
-    @type: name: str
-    @type: directory: name
-    """
-    if not os.path.isdir(directory):
-        raise ProjectsDirectoryNotFoundError(str.format(
-        ))
-    project_name = ensure_end(name, '.sublime-project')
-    return os.path.join(directory, project_name)
-
-
-def sublime_project_command(path):
-    """
-    @type: path: str
-    @returns: str
-    """
-    project_path = ensure_end(path, '.sublime-project')
-    if not os.path.isfile(project_path):
-        raise ProjectNotFoundError(str.format(
-            "No Sublime Text project file found at {0}",
-            project_path
-        ))
-    command = str.format(
-        "subl --project {project_path}",
-        project_path=project_path
-    )
-    return command
-
-
-def is_sublime_project_file(path):
-    """
-    @type: path: str
-    @returns: bool
-    """
-    if os.path.exists(path):
-        if os.path.isfile(path):
-            if path.endswith('sublime-project'):
-                return True
-    return False
-
-
-def in_projects_directory(name, directory):
-    """
-    @type: name: str - project name, with or without extension
-    @type: directory: str - project directory
-    @returns: bool
-    """
-    project_name = ensure_end(name, '.sublime-project')
-
-    if os.path.exists(directory):
-        contents = os.listdir(directory)
-        if project_name in contents:
-            return True
-    return False  # fallthrough condition
-
-
-def ensure_end(haystack, ending):
-    """
-    @type: haystack: str
-    @type: ending: str
-    @returns: str
-    """
-    if haystack.endswith(ending):
-        return haystack
-    else:
-        return haystack+ending
-
-def find_project_files(directory):
-    """
-    @type: directory: str
-    @rtype: iter of str
-    """
-    for name in os.listdir(directory):
-        if name.endswith('.sublime-project'):
-            yield name
-
-def to_paths(iterable, prefix=None):
-    """
-    @type: iterable: iter of str
-    @param: iterable: File names or partial paths of files.
-    @type: prefix: str or None
-    @param: prefix: Directory to use as prefix. If None, uses os.getcwd()
-    @rtype: iter of str
-    @returns: Names with path prefixes joined.
-    to_paths(find_project_files(_string), _string)
-    """
-    if prefix is None:
-        prefix = os.getcwd()
-    for name in iterable:
-        yield os.path.join(prefix, name)
-
-def has_project_file(directory):
-    """
-    Predicate. Does directory contain a sublime project file
-    @type: directory: str
-    @rtype: bool
-    """
-    return bool(list(find_project_files(directory)))
