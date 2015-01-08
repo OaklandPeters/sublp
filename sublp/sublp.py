@@ -18,6 +18,15 @@ __all__ = [
     'Sublp'
 ]
 
+
+class ClassProperty(object):
+    """Creates read-only class-level property."""
+    def __init__(self, f):
+        self.f = f
+    def __get__(self, obj, owner):
+        return self.f(owner)
+
+
 class Sublp(object):
     """
     Generic-function/dispatcher-function for sublp commandline function.
@@ -29,15 +38,13 @@ class Sublp(object):
         projects_directory=configuration.PROJECTS_DIRECTORY
     )
     OpenProjectFallback = dispatch_cases.OpenProjectFallback()
-    OpenProjectFallbackCreateNew = dispatch_cases.OpenProjectFallbackCreateNew()
 
-    cases = [
+    _cases = [  # accessed via 'cases' ClassProperty
         OpenProjectFromFilePath,
         OpenProjectFromDirectory,
         OpenProjectFromName
     ]
-    # fallback = OpenProjectFallback
-    fallback = OpenProjectFallbackCreateNew
+    fallback = OpenProjectFallback
 
     def __new__(cls, _string):
         return cls.__call__(_string)
@@ -63,27 +70,13 @@ class Sublp(object):
 
         _string = cls._validate_string(_string)
 
-        for case in cls._gen_cases():
+        #for case in cls._gen_cases():
+        for case in cls.cases:
             try:  # errors in cases --> skip over that case
                 if case.matches(_string):
                     return case
             except errors.SublpException as exc:
-                cls._case_warning(exc)
-
-
-        # for case in cls.cases:
-        #     try:  # errors in cases --> skip over that case
-        #         if case.matches(_string):
-        #             return case
-        #     except errors.SublpException as exc:
-        #         cls._case_warning(exc)
-
-        # if hasattr(cls, 'fallback'):
-        #     try:  # errors in fallback case --> skip over that case
-        #         if cls.fallback.matches(_string):
-        #             return cls.fallback
-        #     except errors.SublpException as exc:
-
+                cls._case_warning(case, exc)
 
         raise errors.UnmatchedInputString(str.format(
             "Cannot find an appropriate sublime project file for '{0}'.",
@@ -122,17 +115,21 @@ class Sublp(object):
         """
         warnings.warn(str.format(
             "WARNING: Exception in case '{name}', skipping:\n{message}",
-            name=type(case).__name__, message=str(exc)
+            name=type(case).__name__, message=str(exception)
         ))
 
-    @classmethod
-    def _gen_cases(cls):
-        for case in cls.cases:
+    @ClassProperty
+    def cases(cls):
+        """
+        Yields the cases, appending the fallback case if one is present.
+        Iterator. Read-only property.
+        """
+        
+        for case in cls._cases:
             yield case
         if hasattr(cls, 'fallback'):
             if cls.fallback is not None:
                 yield cls.fallback
-
 
 if __name__ == "__main__":
     Sublp(sys.argv[1])

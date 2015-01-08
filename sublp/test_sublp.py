@@ -9,6 +9,12 @@ import interfaces
 import configuration
 import support
 
+# Set correct directory for testing
+file_dir = support.normalize_path(os.path.split(__file__)[0])
+if not os.getcwd() == file_dir:
+    os.chdir(file_dir)
+
+
 class InterfaceTests(unittest.TestCase):
     def test_ProjectDispatchInterface(self):
         def meets_dispatcher(case):
@@ -144,7 +150,11 @@ class FormCommandTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFallback()
 
         self.assertEqual(case.matches(_string), True)
-        expected = "subl \"no_project_file\""
+        expected = (
+            'subl --project "/Users/opeters/Library/Application Support/'
+            'Sublime Text 3/Packages/User/Projects/'
+            'no_project_file.sublime-project" "no_project_file"'
+        )
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -188,7 +198,7 @@ class DispatcherTests(unittest.TestCase):
         )
 
 
-class ProjectCreatorTests(unittest.TestCase):
+class FallbackTests(unittest.TestCase):
     """
     @todo: Distribute these into the above TestCases OR:
     @todo: Split above TestCases into sections, based on dispatcher case
@@ -197,7 +207,7 @@ class ProjectCreatorTests(unittest.TestCase):
     name = 'createit'
     workspace = os.path.join(directory, name+'.sublime-workspace')
     project = os.path.join(directory, name+'.sublime-project')
-    case = dispatch_cases.OpenProjectFallbackCreateNew()
+    case = dispatch_cases.OpenProjectFallback()
 
     def setUp(self):
         if not os.path.isdir(self.directory):
@@ -227,7 +237,7 @@ class ProjectCreatorTests(unittest.TestCase):
         # Should confirm that the dispatcher returns this case
         
         result = sublp.Sublp.match(self.directory)
-        case = sublp.Sublp.OpenProjectFallbackCreateNew
+        case = sublp.Sublp.OpenProjectFallback
         self.assertEqual(result, case)
 
 

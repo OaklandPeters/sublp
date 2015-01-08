@@ -149,7 +149,7 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
         return (len(project_files) == 1)
 
 
-class OpenProjectFallbackCreateNew(interfaces.OpenProjectCaseInterface):
+class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
     """
     Fallback condition.
     Creates new project and workspace files and opens that project.
@@ -254,27 +254,3 @@ class OpenProjectFallbackCreateNew(interfaces.OpenProjectCaseInterface):
         """
         _, _fileext = os.path.split(path)
         return os.path.splitext(_fileext)[0]
-
-
-class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
-    """
-    Fallback case, if no other cases trigger.
-    """
-
-    def matches(self, _string):
-        """
-        @type: _string: str
-        @returns: bool
-        """
-
-        if isinstance(_string, interfaces.ExistingPath):
-            return True
-        return False
-
-    def command(self, _string):
-        """
-        @type: _string: str
-        @rtype: str
-        """
-
-        return support.sublime_basic_command(_string)
