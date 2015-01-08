@@ -9,17 +9,26 @@ Very similar to `subl {PATH}` command, except looks for a
 `{PATH}.sublime-project` file in several standard locations. If not found,
 then it falls back to the behavior of `subl`.
 
-Examples
+Usage
 ---------
 .. code::
 
     sublp {PROJECT-FILE-PATH}
     sublp {DIRECTORY-WITH-PROJECT-FILE}
 
+Examples
+----------
+{{Specific examples from test files should go here}}
+
 
 Installing
 -----------
-Install this package, and then add to your .bash_profile::
+! setup does not work yet
+Setup this package as regular::
+
+    pip install sublp
+
+Then, add to your .bash_profile::
 
     alias sublp='python /path/to/project/sublp.py'
 
@@ -45,7 +54,11 @@ test_invoke.py is intended to be ran 'manually' by commandline to test for '.inv
 
 To run all unit-tests from commandline, use::
     cd sublp         # the outermost project directory
-    python -m unittest discover sublp      # standard unittests
+    python -m sublp.test_sublp         # standard unittests
+    python -m sublp.test_invoke
+    # OR, in Python 2.7+
+    python -m unittest discover .      # standard unittests
+
 
 Contributors
 ------------
