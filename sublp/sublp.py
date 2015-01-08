@@ -2,17 +2,15 @@
 Contains the dispatcher function - to be called by .sh
 command-line scripts.
 """
-
-import os
 import subprocess
 import sys
 import warnings
 
-import dispatch_cases
-import support
-import errors
-import interfaces
-import configuration
+from . import dispatch_cases
+from . import support
+from . import errors
+from . import interfaces
+from . import configuration
 
 __all__ = [
     'Sublp'

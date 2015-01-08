@@ -4,7 +4,7 @@ Support functions.
 import os
 import json
 
-import errors
+from . import errors
 
 __all__ = [
     "ensure_end",

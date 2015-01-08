@@ -1,13 +1,12 @@
 """
 Class Implementations (~Cases for dispatcher)
 """
-import sys
 import os
 
-import interfaces
-import support
-import errors
-import configuration
+from . import interfaces
+from . import support
+from . import errors
+from . import configuration
 
 __all__ = [
     'OpenProjectFromFilePath',
