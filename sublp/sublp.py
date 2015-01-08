@@ -19,10 +19,10 @@ __all__ = [
 
 class ClassProperty(object):
     """Creates read-only class-level property."""
-    def __init__(self, f):
-        self.f = f
+    def __init__(self, function):
+        self.function = function
     def __get__(self, obj, owner):
-        return self.f(owner)
+        return self.function(owner)
 
 
 class Sublp(object):
@@ -67,10 +67,8 @@ class Sublp(object):
         """
 
         _string = cls._validate_string(_string)
-
-        #for case in cls._gen_cases():
         for case in cls.cases:
-            try:  # errors in cases --> skip over that case
+            try:  # errors in a case --> skip over that case
                 if case.matches(_string):
                     return case
             except errors.SublpException as exc:
@@ -117,12 +115,12 @@ class Sublp(object):
         ))
 
     @ClassProperty
-    def cases(cls):
+    def cases(cls):  # pylint:disable=E0213
         """
         Yields the cases, appending the fallback case if one is present.
         Iterator. Read-only property.
         """
-        
+
         for case in cls._cases:
             yield case
         if hasattr(cls, 'fallback'):

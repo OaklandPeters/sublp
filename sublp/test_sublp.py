@@ -153,7 +153,8 @@ class FormCommandTests(unittest.TestCase):
         expected = (
             'subl --project "/Users/opeters/Library/Application Support/'
             'Sublime Text 3/Packages/User/Projects/'
-            'no_project_file.sublime-project" "no_project_file"'
+            'no_project_file.sublime-project" '
+            '"/Users/opeters/Documents/workspace/sublp/sublp/no_project_file"'
         )
         command = case.command(_string)
         self.assertEqual(command, expected)
@@ -228,7 +229,8 @@ class FallbackTests(unittest.TestCase):
         expected = (
             'subl --project "/Users/opeters/Library/Application Support/'
             'Sublime Text 3/Packages/User/Projects/'
-            'test_blank_dir.sublime-project" "test_blank_dir"'
+            'test_blank_dir.sublime-project" '
+            '"/Users/opeters/Documents/workspace/sublp/sublp/test_blank_dir"'
         )
         cmd = self.case.command(self.directory)
         self.assertEqual(cmd, expected)

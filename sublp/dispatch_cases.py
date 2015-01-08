@@ -172,10 +172,16 @@ class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
 
         name = self.parse_name(_string)
         directory = self.parse_directory(_string)
+        self.ensure_directory(directory)
         self.create_project(name, directory)
         self.create_workspace(name, directory)
         project_path = support.form_project_path(name, directory)
-        return support.sublime_targeted_project_command(project_path, _string)
+        target_path = support.normalize_path(_string)
+        command = support.sublime_targeted_project_command(
+            path=project_path,
+            target=target_path
+        )
+        return command
 
     def parse_name(self, _string):
         """
@@ -235,6 +241,16 @@ class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
 
         path = support.form_workspace_path(name, directory)
         support.write_json(path, {})
+
+    def ensure_directory(self, path):
+        """
+        Create directory if it does not exist. Recursive.
+        @type: path: str
+        @param: path: Directory path.
+        """
+        if not os.path.exists(path):
+            if not os.path.isdir(path):
+                os.makedirs(path)
 
     def _get_final_dir(self, path):
         """

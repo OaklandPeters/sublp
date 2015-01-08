@@ -7,7 +7,12 @@ import unittest
 
 import dispatch_cases
 import sublp
+import support
 
+# Set correct directory for testing
+file_dir = support.normalize_path(os.path.split(__file__)[0])
+if not os.getcwd() == file_dir:
+    os.chdir(file_dir)
 
 class InvokeTests(unittest.TestCase):
     def setUp(self):
