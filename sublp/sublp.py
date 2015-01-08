@@ -6,6 +6,7 @@ command-line scripts.
 import os
 import subprocess
 import sys
+import warnings
 
 import dispatch_cases
 import support
@@ -28,13 +29,15 @@ class Sublp(object):
         projects_directory=configuration.PROJECTS_DIRECTORY
     )
     OpenProjectFallback = dispatch_cases.OpenProjectFallback()
+    OpenProjectFallbackCreateNew = dispatch_cases.OpenProjectFallbackCreateNew()
 
     cases = [
         OpenProjectFromFilePath,
         OpenProjectFromDirectory,
         OpenProjectFromName
     ]
-    fallback = OpenProjectFallback
+    # fallback = OpenProjectFallback
+    fallback = OpenProjectFallbackCreateNew
 
     def __new__(cls, _string):
         return cls.__call__(_string)
@@ -60,13 +63,27 @@ class Sublp(object):
 
         _string = cls._validate_string(_string)
 
-        for case in cls.cases:
-            if case.matches(_string):
-                return case
+        for case in cls._gen_cases():
+            try:  # errors in cases --> skip over that case
+                if case.matches(_string):
+                    return case
+            except errors.SublpException as exc:
+                cls._case_warning(exc)
 
-        if hasattr(cls, 'fallback'):
-            if cls.fallback.matches(_string):
-                return cls.fallback
+
+        # for case in cls.cases:
+        #     try:  # errors in cases --> skip over that case
+        #         if case.matches(_string):
+        #             return case
+        #     except errors.SublpException as exc:
+        #         cls._case_warning(exc)
+
+        # if hasattr(cls, 'fallback'):
+        #     try:  # errors in fallback case --> skip over that case
+        #         if cls.fallback.matches(_string):
+        #             return cls.fallback
+        #     except errors.SublpException as exc:
+
 
         raise errors.UnmatchedInputString(str.format(
             "Cannot find an appropriate sublime project file for '{0}'.",
@@ -76,7 +93,7 @@ class Sublp(object):
     @classmethod
     def invoke(cls, case, _string):
         """
-        @type: case: OpenProjectCaseInterface
+        @type: case: interfaces.OpenProjectCaseInterface
         @type: _string: str
         @rtype: None
         """
@@ -96,6 +113,25 @@ class Sublp(object):
         if not isinstance(_string, str):
             raise TypeError("'_string' must be instance of str.")
         return _string
+
+    @classmethod
+    def _case_warning(cls, case, exception):
+        """
+        @type: case: interfaces.OpenProjectCaseInterface
+        @type: exception: Exception
+        """
+        warnings.warn(str.format(
+            "WARNING: Exception in case '{name}', skipping:\n{message}",
+            name=type(case).__name__, message=str(exc)
+        ))
+
+    @classmethod
+    def _gen_cases(cls):
+        for case in cls.cases:
+            yield case
+        if hasattr(cls, 'fallback'):
+            if cls.fallback is not None:
+                yield cls.fallback
 
 
 if __name__ == "__main__":

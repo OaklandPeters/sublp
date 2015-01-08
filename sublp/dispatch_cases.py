@@ -149,6 +149,113 @@ class OpenProjectFromDirectory(interfaces.OpenProjectCaseInterface):
         return (len(project_files) == 1)
 
 
+class OpenProjectFallbackCreateNew(interfaces.OpenProjectCaseInterface):
+    """
+    Fallback condition.
+    Creates new project and workspace files and opens that project.
+    ... this probably requires an existing folder
+    """
+    def matches(self, _string):
+        """
+        @type: _string: str
+        @returns: bool
+        """
+
+        if isinstance(_string, interfaces.ExistingPath):
+            return True
+        return False
+
+    def command(self, _string):
+        """
+        @type: _string: str
+        @rtype: str
+        """
+
+        name = self.parse_name(_string)
+        directory = self.parse_directory(_string)
+        self.create_project(name, directory)
+        self.create_workspace(name, directory)
+        project_path = support.form_project_path(name, directory)
+        return support.sublime_targeted_project_command(project_path, _string)
+
+    def parse_name(self, _string):
+        """
+        Return the name which should be used for the project file.
+        """
+
+        path = support.normalize_path(_string)
+        if os.path.isdir(path):
+            # final part of directory
+            return self._get_final_dir(path)
+        elif os.path.isfile(path):
+            # file name, without path or extension
+            return self._get_file_no_ext(path)
+        else:
+            raise errors.SublpException(
+                "{0} does not know how to find project name for '{1}'.",
+                type(self).__name__, path
+            )
+
+    def parse_directory(self, _string):
+        """
+        Return directory where project files should be contained.
+        """
+
+        # Default projects directory
+        if configuration.DEFAULT_TO_PROJECTS_DIRECTORY:
+            if os.path.isdir(configuration.PROJECTS_DIRECTORY):
+                return configuration.PROJECTS_DIRECTORY
+        # Extract destination directory from input
+        path = support.normalize_path(_string)
+        if os.path.isdir(path):
+            return path
+        elif os.path.isfile(path):
+            return os.path.split(path)[0]
+        else:
+            raise errors.SublpException(
+                "{0} does not know how to find directory for '{1}'.",
+                type(self).__name__, path
+            )
+
+    def create_project(self, name, directory):
+        """
+        @type: name: str
+        @type: directory: str
+        @rtype: None
+        """
+
+        path = support.form_project_path(name, directory)
+        support.write_json(path, {})
+
+    def create_workspace(self, name, directory):
+        """
+        @type: name: str
+        @type: directory: str
+        @rtype: None
+        """
+
+        path = support.form_workspace_path(name, directory)
+        support.write_json(path, {})
+
+    def _get_final_dir(self, path):
+        """
+        Returns final directory contained in path.
+        Path should *not* be a file.
+        @type: path: str
+        @param: path: a directory
+        @rtype: str
+        """
+        return os.path.basename(support.normalize_path(path))
+
+    def _get_file_no_ext(self, path):
+        """
+        @type: path: str
+        @rtype: str
+        """
+        _, _fileext = os.path.split(path)
+        return os.path.splitext(_fileext)[0]
+
+
 class OpenProjectFallback(interfaces.OpenProjectCaseInterface):
     """
     Fallback case, if no other cases trigger.

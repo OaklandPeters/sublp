@@ -6,6 +6,8 @@ import sublp
 import errors
 import dispatch_cases
 import interfaces
+import configuration
+import support
 
 class InterfaceTests(unittest.TestCase):
     def test_ProjectDispatchInterface(self):
@@ -107,7 +109,7 @@ class FormCommandTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFromFilePath()
 
         self.assertEqual(case.matches(_string), True)
-        expected = "subl --project test_bypath/bypath.sublime-project"
+        expected = "subl --project \"test_bypath/bypath.sublime-project\""
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -120,8 +122,8 @@ class FormCommandTests(unittest.TestCase):
         )
 
         self.assertEqual(case.matches(_string), True)
-        expected = ("subl --project test_standard_projects_directory"
-                    "/byname.sublime-project")
+        path = os.path.join(projects_directory, _string+".sublime-project")
+        expected = "subl --project \"{0}\"".format(path)
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -131,7 +133,8 @@ class FormCommandTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFromDirectory()
 
         self.assertEqual(case.matches(_string), True)
-        expected = "subl --project test_project_directory/bydir.sublime-project"
+        path = os.path.join(_string, 'bydir'+".sublime-project")
+        expected = "subl --project \"{0}\"".format(path)
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -141,7 +144,7 @@ class FormCommandTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFallback()
 
         self.assertEqual(case.matches(_string), True)
-        expected = "subl no_project_file"
+        expected = "subl \"no_project_file\""
         command = case.command(_string)
         self.assertEqual(command, expected)
 
@@ -173,10 +176,60 @@ class DispatcherTests(unittest.TestCase):
         )
 
     def test_fallback(self):
-        self.compare_matcher(
-            name="no_project_file",
-            case=sublp.Sublp.OpenProjectFallback
+        name = "no_project_file"
+        path = support.form_project_path(
+            name, configuration.PROJECTS_DIRECTORY
         )
+        if os.path.exists(path):
+            os.remove(path)
+        self.compare_matcher(
+            name=name,
+            case=sublp.Sublp.fallback
+        )
+
+
+class ProjectCreatorTests(unittest.TestCase):
+    """
+    @todo: Distribute these into the above TestCases OR:
+    @todo: Split above TestCases into sections, based on dispatcher case
+    """
+    directory = 'test_blank_dir'
+    name = 'createit'
+    workspace = os.path.join(directory, name+'.sublime-workspace')
+    project = os.path.join(directory, name+'.sublime-project')
+    case = dispatch_cases.OpenProjectFallbackCreateNew()
+
+    def setUp(self):
+        if not os.path.isdir(self.directory):
+            os.mkdir(self.directory)
+        if os.path.isfile(self.project):
+            os.mkdir(self.project)
+        if os.path.isfile(self.workspace):
+            os.remove(self.workspace)
+
+    def test_matcher(self):
+        self.assertTrue(self.case.matches(self.directory))
+        self.assertTrue(self.case.matches(
+            os.path.join("test_bypath", "bypath.sublime-project"))
+        )
+        self.assertFalse(self.case.matches("bypath"))
+
+    def test_command(self):
+        expected = (
+            'subl --project "/Users/opeters/Library/Application Support/'
+            'Sublime Text 3/Packages/User/Projects/'
+            'test_blank_dir.sublime-project" "test_blank_dir"'
+        )
+        cmd = self.case.command(self.directory)
+        self.assertEqual(cmd, expected)
+
+    def test_dispatcher(self):
+        # Should confirm that the dispatcher returns this case
+        
+        result = sublp.Sublp.match(self.directory)
+        case = sublp.Sublp.OpenProjectFallbackCreateNew
+        self.assertEqual(result, case)
+
 
 
 if __name__ == "__main__":
