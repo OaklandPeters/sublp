@@ -11,6 +11,6 @@ __all__ = [
 ]
 
 if sys.version_info[0] < 3:
-    from py2 import (ExistingDirectory, ExistingFile, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
+    from .py2 import (ExistingDirectory, ExistingFile, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=W0403
 else:
-    from py3 import (ExistingDirectory, ExistingFile, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401
+    from .py3 import (ExistingDirectory, ExistingFile, ExistingPath, OpenProjectCaseInterface)  # pylint:disable=F0401

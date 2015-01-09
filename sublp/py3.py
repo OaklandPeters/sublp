@@ -53,7 +53,7 @@ def meets(obj, interface):
     @type: interface: abc.ABCMeta
     @rtype: bool
     """
-    return bool(list(missing_abstracts(obj, interface)))
+    return not bool(list(missing_abstracts(obj, interface)))
 
 
 def missing_abstracts(obj, interface):
@@ -74,7 +74,7 @@ def has_concrete_method(obj, name):
     @returns: bool
     """
     if hasattr(obj, name):
-        return is_abstract_method(getattr(obj, name))
+        return not is_abstract_method(getattr(obj, name))
     else:
         return False
 

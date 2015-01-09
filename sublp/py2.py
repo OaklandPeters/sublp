@@ -57,11 +57,12 @@ def meets(obj, interface):
     @type: interface: abc.ABCMeta
     @rtype: bool
     """
-    return bool(list(missing_abstracts(obj, interface)))
+    return not bool(list(missing_abstracts(obj, interface)))
 
 
 def missing_abstracts(obj, interface):
     """
+    __abstractmethods__ is generally only set on classes subect to abc.ABCMeta
     @type: obj: object
     @type: interface: abc.ABCMeta
     @rtype: str
@@ -78,12 +79,16 @@ def has_concrete_method(obj, name):
     @returns: bool
     """
     if hasattr(obj, name):
-        return is_abstract_method(getattr(obj, name))
+        return not is_abstract_method(getattr(obj, name))
     else:
         return False
 
 
 def is_abstract_method(method):
+    """
+    @type: method: object
+    @param: A method object.
+    """
     return getattr(method, '__isabstractmethod__', False)
 
 
