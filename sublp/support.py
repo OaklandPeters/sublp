@@ -126,11 +126,12 @@ def in_projects_directory(name, directory):
 
 def ensure_end(haystack, ending):
     """
-    Ensure that string ends with specific ending.
+    Ensure that string ends with specific character sequence.
     @type: haystack: str
     @type: ending: str
     @returns: str
     """
+
     if haystack.endswith(ending):
         return haystack
     else:
@@ -138,10 +139,11 @@ def ensure_end(haystack, ending):
 
 def find_project_files(directory):
     """
-    Return .sublime-project files contained in directory.
+    Yield .sublime-project files contained in directory.
     @type: directory: str
     @rtype: iter of str
     """
+
     for name in os.listdir(directory):
         if name.endswith('.sublime-project'):
             yield name
@@ -157,6 +159,7 @@ def to_paths(iterable, prefix=None):
     @returns: Names with path prefixes joined.
     to_paths(find_project_files(_string), _string)
     """
+
     if prefix is None:
         prefix = os.getcwd()
     for name in iterable:
@@ -168,13 +171,16 @@ def has_project_file(directory):
     @type: directory: str
     @rtype: bool
     """
+    
     return bool(list(find_project_files(directory)))
 
 def normalize_path(path):
     """
+    Cleanup path, and express as absolute path.
     @type: path: str
     @rtype: str
     """
+
     return os.path.abspath(os.path.normpath(path))
 
 def write_json(path, values):
