@@ -184,5 +184,6 @@ def write_json(path, values):
     @type: values: collections.Mapping
     @rtype: None
     """
-    with open(path, 'wb') as fi:
-        json.dump(values, fi)
+
+    with open(path, 'w') as json_file:
+        json.dump(values, json_file)

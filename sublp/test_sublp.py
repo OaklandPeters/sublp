@@ -2,12 +2,12 @@ import os
 import unittest
 import pdb
 
-import dispatcher
-import errors
-import dispatch_cases
-import interfaces
-import configuration
-import support
+from . import dispatcher
+from . import errors
+from . import dispatch_cases
+from . import interfaces
+from . import configuration
+from . import support
 
 # Set correct directory for testing
 file_dir = support.normalize_path(os.path.split(__file__)[0])

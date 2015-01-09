@@ -5,9 +5,9 @@ Do not run with standard unittests.
 import os
 import unittest
 
-import dispatch_cases
-import dispatcher
-import support
+from . import dispatch_cases
+from . import dispatcher
+from . import support
 
 # Set correct directory for testing
 file_dir = support.normalize_path(os.path.split(__file__)[0])
