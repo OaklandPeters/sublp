@@ -8,4 +8,4 @@ __all__ = [
     "Sublp"
 ]
 
-from .sublp import Sublp
+from .dispatcher import Sublp

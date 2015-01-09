@@ -127,5 +127,5 @@ class Sublp(object):
             if cls.fallback is not None:
                 yield cls.fallback
 
-if __name__ == "__main__":
-    Sublp(sys.argv[1])
+# if __name__ == "__main__":
+#     Sublp(sys.argv[1])
