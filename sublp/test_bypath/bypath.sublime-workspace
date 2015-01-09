@@ -23,7 +23,7 @@
 			"file": "/Users/opeters/Documents/workspace/sublp/sublp/configuration.py",
 			"settings":
 			{
-				"buffer_size": 295,
+				"buffer_size": 501,
 				"line_ending": "Unix"
 			}
 		},
@@ -31,7 +31,7 @@
 			"file": "/Users/opeters/Documents/workspace/sublp/sublp/test_invoke.py",
 			"settings":
 			{
-				"buffer_size": 1649,
+				"buffer_size": 1842,
 				"line_ending": "Unix"
 			}
 		}
@@ -669,7 +669,7 @@
 					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 295,
+						"buffer_size": 501,
 						"regions":
 						{
 						},
@@ -756,15 +756,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1649,
+						"buffer_size": 1842,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1648,
-								1648
+								0,
+								0
 							]
 						],
 						"settings":

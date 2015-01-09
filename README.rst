@@ -53,9 +53,11 @@ test_sublp.py runs Python unittests on the invernal/private Python functions.
 test_invoke.py is intended to be ran 'manually' by commandline to test for '.invoke' commands which actually open SublimeText windows.
 
 To run all unit-tests from commandline, use::
+
     cd sublp         # the outermost project directory
     python -m sublp.test_sublp         # standard unittests
     python -m sublp.test_invoke
+
     # OR, in Python 2.7+
     python -m unittest discover .      # standard unittests
 

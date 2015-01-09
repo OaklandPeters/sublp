@@ -6,7 +6,7 @@ import os
 import unittest
 
 import dispatch_cases
-import sublp
+import dispatcher
 import support
 
 # Set correct directory for testing
@@ -24,7 +24,7 @@ class InvokeTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFromFilePath()
 
         self.assertTrue(case.matches(_string))
-        sublp.Sublp.invoke(case, _string)
+        dispatcher.Sublp.invoke(case, _string)
 
     def test_OpenFromProjectName(self):  #pylint:disable=C0103
         """Open based on name of project - contained in standard
@@ -36,7 +36,7 @@ class InvokeTests(unittest.TestCase):
         )
 
         self.assertTrue(case.matches(_string))
-        sublp.Sublp.invoke(case, _string)
+        dispatcher.Sublp.invoke(case, _string)
 
     def test_OpenFromDirectory(self):  #pylint:disable=C0103
         """Open based on name of directory containing projects file."""
@@ -44,7 +44,7 @@ class InvokeTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFromDirectory()
 
         self.assertTrue(case.matches(_string))
-        sublp.Sublp.invoke(case, _string)
+        dispatcher.Sublp.invoke(case, _string)
 
     def test_OpenProjectFallback(self):  #pylint:disable=C0103
         """Run fallback -- no projects file."""
@@ -52,7 +52,7 @@ class InvokeTests(unittest.TestCase):
         case = dispatch_cases.OpenProjectFallback()
 
         self.assertTrue(case.matches(_string))
-        sublp.Sublp.invoke(case, _string)
+        dispatcher.Sublp.invoke(case, _string)
 
 
 

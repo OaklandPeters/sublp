@@ -2,7 +2,7 @@ import os
 import unittest
 import pdb
 
-import sublp
+import dispatcher
 import errors
 import dispatch_cases
 import interfaces
@@ -20,7 +20,7 @@ class InterfaceTests(unittest.TestCase):
         def meets_dispatcher(case):
             return issubclass(case, interfaces.OpenProjectCaseInterface)
 
-        for case in sublp.Sublp.cases:
+        for case in dispatcher.Sublp.cases:
             self.assertTrue(meets_dispatcher(case))
 
     def test_ExistingDirectory(self):
@@ -163,17 +163,17 @@ class FormCommandTests(unittest.TestCase):
 class DispatcherTests(unittest.TestCase):
 
     def compare_matcher(self, name, case):
-        result = sublp.Sublp.match(name)
+        result = dispatcher.Sublp.match(name)
         self.assertEqual(result, case)
 
     def test_file_path(self):
         self.compare_matcher(
             name=os.path.join("test_bypath", "bypath"),
-            case=sublp.Sublp.OpenProjectFromFilePath
+            case=dispatcher.Sublp.OpenProjectFromFilePath
         )
 
     def test_in_projects(self):
-        case = sublp.Sublp.OpenProjectFromName
+        case = dispatcher.Sublp.OpenProjectFromName
         case.projects_directory = "test_standard_projects_directory"
         self.compare_matcher(
             name="byname",
@@ -183,7 +183,7 @@ class DispatcherTests(unittest.TestCase):
     def test_in_directory(self):
         self.compare_matcher(
             name="test_project_directory",
-            case=sublp.Sublp.OpenProjectFromDirectory
+            case=dispatcher.Sublp.OpenProjectFromDirectory
         )
 
     def test_fallback(self):
@@ -195,7 +195,7 @@ class DispatcherTests(unittest.TestCase):
             os.remove(path)
         self.compare_matcher(
             name=name,
-            case=sublp.Sublp.fallback
+            case=dispatcher.Sublp.fallback
         )
 
 
@@ -238,8 +238,8 @@ class FallbackTests(unittest.TestCase):
     def test_dispatcher(self):
         # Should confirm that the dispatcher returns this case
         
-        result = sublp.Sublp.match(self.directory)
-        case = sublp.Sublp.OpenProjectFallback
+        result = dispatcher.Sublp.match(self.directory)
+        case = dispatcher.Sublp.OpenProjectFallback
         self.assertEqual(result, case)
 
 
