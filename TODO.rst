@@ -1,5 +1,6 @@
 Code Refactoring
 -----------------
+- Allow sublp to passthrough other arguments. EG 'sublp {name} path' should be equivalent to sublime --project=name path.
 - Change configuration file to being a JSON file (sublprc.json), and add configuration reader function
 - Create a version (sublp_dist) which combines everything in one file.
 

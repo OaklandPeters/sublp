@@ -9,6 +9,9 @@ from . import interfaces
 from . import configuration
 from . import support
 
+PROJECT_EXTENSION = ".sublime-project"
+WORKSPACE_EXTENSION = ".sublime-workspace"
+
 # Set correct directory for testing
 file_dir = support.normalize_path(os.path.split(__file__)[0])
 if not os.getcwd() == file_dir:
@@ -243,6 +246,35 @@ class FallbackTests(unittest.TestCase):
         self.assertEqual(result, case)
 
 
+class NumberInNameTests(unittest.TestCase):
+    """
+    Tests for strange and unusual inputs.
+    """
+    directory = "test_standard_projects_directory"
+    name = "3rd-party"
+    project = os.path.join(directory, name+PROJECT_EXTENSION)
+    workspace = os.path.join(directory, name+WORKSPACE_EXTENSION)
+    case = dispatch_cases.OpenProjectFallback()
+
+    def setUp(self):
+        if os.path.exists(self.project):
+            os.remove(self.project)
+        if os.path.exists(self.workspace):
+            os.remove(self.workspace)
+
+    def test_basic(self):
+        matches = self.case.matches(self.name)
+
+        print()
+        print("matches:", type(matches), matches)
+        print()
+        import pdb
+        pdb.set_trace()
+        print()
+        
+                
+
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
+    unittest.main(NumberInNameTests)
