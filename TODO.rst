@@ -1,3 +1,16 @@
+NEW Simple Version
+======================
+Simplification: ALL project files stored in standard directory. First step on starting funciton - confirm/create the standard directory.
+
+3 core functions:
+    sublp (list|open|create)
+
+Convenience polymorphism:
+    sublp: → sublp list
+    sublp $name: → sublp open $name
+    sublp $name $path: → sublp create $name $path
+
+
 Code Refactoring
 -----------------
 - Add additional commandline options:
